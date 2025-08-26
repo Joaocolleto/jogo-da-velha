@@ -1,9 +1,12 @@
 //criação do elemento square que ira compor o tabuleiro
 import "./App.css";
+import { useState } from "react";
 
-function Square({ valor }) {
-  function handleClick(){
-    console.log("Botão clicado!!!")
+function Square() {
+  const [valor, setvalor] = useState(null);
+
+  function handleClick() {
+    setvalor('X');
   }
   return (
     <button className="square" onClick={handleClick}>
@@ -15,20 +18,20 @@ function Square({ valor }) {
 export default function Tabuleiro() {
   return (
     <div>
-      <Square valor="1" />
-      <Square valor="2" />
-      <Square valor="3" />
+      <Square  />
+      <Square />
+      <Square  />
 
       <div>
-        <Square valor="4" />
-        <Square valor="5" />
-        <Square valor="6" />
+        <Square  />
+        <Square  />
+        <Square  />
       </div>
 
       <div></div>
-      <Square valor="7" />
-      <Square valor="8" />
-      <Square valor="9" />
+      <Square  />
+      <Square  />
+      <Square  />
     </div>
   );
 }
