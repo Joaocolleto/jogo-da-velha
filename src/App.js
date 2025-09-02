@@ -1,4 +1,4 @@
-//criação do elemento square que ira compor o tabuleiro
+// Criação do elemento Square que irá compor o tabuleiro
 import "./App.css";
 import { useState } from "react";
 
@@ -10,35 +10,36 @@ function Square({ valor, onSquareClick }) {
   );
 }
 
-function Tabuleiro({xIsNext, squares, onPlay}) {
+function Tabuleiro({ xIsNext, squares, onPlay }) {
   function handleClick(i) {
-    if (squares[i] || calculaVencedor(squares)) {
+    /**Se squares[i] é null o if não executa o return.
+     * o handleClick continua a execução pois o return não
+     * foi executado, o squares[i] era NULL!
+     */
+    if (squares[i] || haVencedor(squares)) {
       return;
     }
 
-    //o handle click continua a execução pois o return não foi executado
     const nextSquares = squares.slice();
-
     if (xIsNext) {
       nextSquares[i] = "X";
     } else {
       nextSquares[i] = "O";
-      onPlay(nextSquares);
     }
+    onPlay(nextSquares);
   }
-  const vencedor = calculaVencedor(squares);
+  const vencedor = haVencedor(squares);
   let status;
   if (vencedor) {
     status = "Vencedor: " + vencedor;
   } else {
-    status = "Proximo a jogar: " + (xIsNext ? "X" : "O");
+    status = "Próximo a jogar: " + (xIsNext ? "X" : "O");
   }
 
   return (
     <div className="container">
-      <h1>Jogo da Veia</h1>
+      <div className="status">{status}</div>
       <div>
-        <div className="status">{status}</div>
         <Square
           valor={squares[0]}
           onSquareClick={() => {
@@ -58,7 +59,6 @@ function Tabuleiro({xIsNext, squares, onPlay}) {
           }}
         />
       </div>
-
       <div>
         <Square
           valor={squares[3]}
@@ -79,7 +79,6 @@ function Tabuleiro({xIsNext, squares, onPlay}) {
           }}
         />
       </div>
-
       <div>
         <Square
           valor={squares[6]}
@@ -102,62 +101,99 @@ function Tabuleiro({xIsNext, squares, onPlay}) {
       </div>
     </div>
   );
-}
+}; 
+
+//Componente Game
 export default function Game() {
   const [history, setHistory] = useState([Array(9).fill(null)]);
   const [currentMove, setCurrentMove] = useState(0);
   const xIsNext = currentMove % 2 === 0;
   const currentSquares = history[currentMove];
 
-  function handlePlay(nextSquares){
-    const nextHistory = [...history.slice(0,currentMove+1),nextSquares];
+  function handlePlay(nextSquares) {
+    const nextHistory = [...history.slice(0, currentMove + 1), nextSquares];
     setHistory(nextHistory);
     setCurrentMove(nextHistory.length - 1);
   }
 
-function jumpTo(nextMove){
-  setCurrentMove(nextMove);
-}
-
-const moves = history.map((squares,move) => {
-  let description;
-  if(move > 0){
-    description = "Vai para o movimento #" + move;
-  } else{
-    description = "Aqui sim vai para o inicio do jogo!";
+  function jumpTo(nextMove) {
+    setCurrentMove(nextMove);
   }
-  return(
-    <li key={move}>
-      <button onClick={()=>jumpTo(move)}>{description}</button>
-    </li>
-  );
-});
-return(
-  <div className="game">
-    <div className="game-board">
-      <Tabuleiro xIsNext={xIsNext} squares={currentSquares} onPlay={handlePlay}/></div>
+
+  const moves = history.map((squares, move) => {
+    let description;
+    if (move > 0) {
+      description = "Vai para o movimento #" + move;
+    } else {
+      description = "Vai para o início do Jogo!";
+    }
+    return (
+      <li key={move}>
+        <button onClick={() => jumpTo(move)}>{description}</button>
+      </li>
+    );
+  });
+
+  return (
+    <div className="game">
+      <div className="game-board">
+        <Tabuleiro
+          xIsNext={xIsNext}
+          squares={currentSquares}
+          onPlay={handlePlay}
+        />
+      </div>
       <div className="game-info">
         <ol>{moves}</ol>
       </div>
-  </div>
-);
-
+    </div>
+  );
 }
-function calculaVencedor(squares) {
-  const linhas = [
-    [0, 1, 2],
-    [6, 7, 8],
-    [0, 3, 6],
-    [1, 4, 7],
-    [2, 5, 8],
-    [0, 4, 8],
-    [2, 4, 6],
-  ];
-  for (let i = 0; i < linhas.length; i++) {
-    const [a, b, c] = linhas[i];
-    if (squares[a] && squares[a] === squares[b] && squares[a] === squares[c]) {
-      return squares[a];
-    }
+
+function haVencedor(squares) {
+  if (squares[0] && squares[0] === squares[1] && squares[0] === squares[2]) {
+    return squares[0];
+  } else if (
+    squares[3] &&
+    squares[3] === squares[4] &&
+    squares[3] === squares[5]
+  ) {
+    return squares[3];
+  } else if (
+    squares[6] &&
+    squares[6] === squares[7] &&
+    squares[6] === squares[8]
+  ) {
+    return squares[6];
+  } else if (
+    squares[0] &&
+    squares[0] === squares[3] &&
+    squares[0] === squares[6]
+  ) {
+    return squares[0];
+  } else if (
+    squares[1] &&
+    squares[1] === squares[4] &&
+    squares[1] === squares[7]
+  ) {
+    return squares[1];
+  } else if (
+    squares[2] &&
+    squares[2] === squares[5] &&
+    squares[2] === squares[8]
+  ) {
+    return squares[2];
+  } else if (
+    squares[0] &&
+    squares[0] === squares[4] &&
+    squares[0] === squares[8]
+  ) {
+    return squares[0];
+  } else if (
+    squares[2] &&
+    squares[2] === squares[4] &&
+    squares[2] === squares[6]
+  ) {
+    return squares[2];
   }
-  return null;
 }
