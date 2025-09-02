@@ -15,10 +15,13 @@ export default function Tabuleiro() {
   const [xIsNext, setXIsNext] = useState(true);
 
   function handleClick(i) {
-    if (squares[i]) return; //se squares[i] é null o if não executa o return
+    if (squares[i] || calculaVencedor(squares)){
+      return
+    };
 
     //o handle click continua a execução pois o return não foi executado
     const nextSquares = squares.slice();
+    
 
     if (xIsNext) {
       nextSquares[i] = "X";
@@ -30,12 +33,14 @@ export default function Tabuleiro() {
   }
 
   return (
-    <div>
+    <div className="container">
+      <h1>Jogo da Veia</h1>
       <div>
         <Square
           valor={squares[0]}
           onSquareClick={() => {
             handleClick(0);
+            
           }}
         />
         <Square
@@ -96,3 +101,23 @@ export default function Tabuleiro() {
     </div>
   );
 }
+  
+function calculaVencedor(squares){
+ const linhas = [
+    [0, 1, 2], 
+    [6, 7, 8], 
+    [0, 3, 6], 
+    [1, 4, 7], 
+    [2, 5, 8], 
+    [0, 4, 8], 
+    [2, 4, 6],
+  ];
+   for (let i = 0; i < linhas.length; i++) {
+    const [a, b, c] = linhas[i];
+    if (squares[a] && squares[a] === squares[b] && squares[a] === squares[c]) {
+      return squares[a];
+    }
+  }
+    return null ; 
+}
+
