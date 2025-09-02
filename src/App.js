@@ -10,50 +10,39 @@ function Square({ valor, onSquareClick }) {
   );
 }
 
-
-
-
- function Tabuleiro(xIsNext,squares,onPlay) {
-
-
+function Tabuleiro({xIsNext, squares, onPlay}) {
   function handleClick(i) {
-    if (squares[i] || calculaVencedor(squares)){
-      return
-    };
+    if (squares[i] || calculaVencedor(squares)) {
+      return;
+    }
 
     //o handle click continua a execução pois o return não foi executado
     const nextSquares = squares.slice();
-    
 
     if (xIsNext) {
       nextSquares[i] = "X";
     } else {
       nextSquares[i] = "O";
-      onPlay(nextSquares)
+      onPlay(nextSquares);
     }
-    
   }
-const vencedor = calculaVencedor(squares);
-let status;
-if(vencedor){
-  status = "Vencedor: "+ vencedor;
-}
-else{
-status = "Proximo a jogar: " +(xIsNext ? "X" : "O")
-}
+  const vencedor = calculaVencedor(squares);
+  let status;
+  if (vencedor) {
+    status = "Vencedor: " + vencedor;
+  } else {
+    status = "Proximo a jogar: " + (xIsNext ? "X" : "O");
+  }
 
   return (
     <div className="container">
       <h1>Jogo da Veia</h1>
       <div>
-        <div className="status">
-          {status}
-        </div>
+        <div className="status">{status}</div>
         <Square
           valor={squares[0]}
           onSquareClick={() => {
             handleClick(0);
-            
           }}
         />
         <Square
@@ -114,28 +103,61 @@ status = "Proximo a jogar: " +(xIsNext ? "X" : "O")
     </div>
   );
 }
-  export default function Game(){
-    const[history, setHistory] = useState([Array(9).fill(null)]);
-    const[squares,setSquare] = useState(Array(9).fill(null));
-    const[currentMove,setCurrentMove] = useState(0);
-    const xIsNext = currentMove % 2 == 0;
+export default function Game() {
+  const [history, setHistory] = useState([Array(9).fill(null)]);
+  const [currentMove, setCurrentMove] = useState(0);
+  const xIsNext = currentMove % 2 === 0;
+  const currentSquares = history[currentMove];
+
+  function handlePlay(nextSquares){
+    const nextHistory = [...history.slice(0,currentMove+1),nextSquares];
+    setHistory(nextHistory);
+    setCurrentMove(nextHistory.length - 1);
   }
-function calculaVencedor(squares){
- const linhas = [
-    [0, 1, 2], 
-    [6, 7, 8], 
-    [0, 3, 6], 
-    [1, 4, 7], 
-    [2, 5, 8], 
-    [0, 4, 8], 
+
+function jumpTo(nextMove){
+  setCurrentMove(nextMove);
+}
+
+const moves = history.map((squares,move) => {
+  let description;
+  if(move > 0){
+    description = "Vai para o movimento #" + move;
+  } else{
+    description = "Aqui sim vai para o inicio do jogo!";
+  }
+  return(
+    <li key={move}>
+      <button onClick={()=>jumpTo(move)}>{description}</button>
+    </li>
+  );
+});
+return(
+  <div className="game">
+    <div className="game-board">
+      <Tabuleiro xIsNext={xIsNext} squares={currentSquares} onPlay={handlePlay}/></div>
+      <div className="game-info">
+        <ol>{moves}</ol>
+      </div>
+  </div>
+);
+
+}
+function calculaVencedor(squares) {
+  const linhas = [
+    [0, 1, 2],
+    [6, 7, 8],
+    [0, 3, 6],
+    [1, 4, 7],
+    [2, 5, 8],
+    [0, 4, 8],
     [2, 4, 6],
   ];
-   for (let i = 0; i < linhas.length; i++) {
+  for (let i = 0; i < linhas.length; i++) {
     const [a, b, c] = linhas[i];
     if (squares[a] && squares[a] === squares[b] && squares[a] === squares[c]) {
       return squares[a];
     }
   }
-    return null ; 
+  return null;
 }
-
